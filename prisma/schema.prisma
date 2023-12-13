@@ -9,3 +9,17 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Aluno {
+  id String @db.Uuid @id @default(uuid())
+  nome String @db.VarChar(50)
+  email String @db.VarChar(50) @unique
+  senha String @db.VarChar(50)
+
+  idade Int? @db.SmallInt
+
+  dthrCriacao DateTime @default(now()) @map("dthr_criacao")
+  dthrAtualizacao DateTime @updatedAt @map("dthr_atualizacao")
+
+  @@map("aluno")
+}
