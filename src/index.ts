@@ -8,6 +8,7 @@ const alunoController = new AlunoController();
 
 // Criar um novo aluno
 app.post("/aluno", alunoController.criarAluno);
+app.get("/aluno/:id", alunoController.obterAluno);
 
 app.listen(3335, () => {
     console.log("API está rodando");
