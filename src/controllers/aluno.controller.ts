@@ -75,4 +75,47 @@ export class AlunoController {
             });
         }
     }
+
+    // PUT - atualizar um aluno
+
+    // DELETE - deletar um aluno
+    public async deletarAluno(req: Request, res: Response) {
+        try {
+            // 1- Entrada
+            const { id } = req.params;
+
+            // 2- Processamento
+            // verificar se o aluno existe, se não 404
+            const aluno = await repository.aluno.findUnique({
+                where: {
+                    id,
+                },
+            });
+
+            if (!aluno) {
+                return res.status(404).send({
+                    ok: false,
+                    message: "Aluno não encontrado",
+                });
+            }
+
+            // deletar o aluno
+            await repository.aluno.delete({
+                where: {
+                    id,
+                },
+            });
+
+            // 3- Saída
+            return res.status(200).send({
+                ok: true,
+                message: "Aluno deletado com sucesso",
+            });
+        } catch (error: any) {
+            return res.status(500).send({
+                ok: false,
+                message: error.toString(),
+            });
+        }
+    }
 }
