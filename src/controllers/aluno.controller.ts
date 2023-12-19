@@ -48,11 +48,6 @@ export class AlunoController {
                 where: {
                     id,
                 },
-                select: {
-                    id: true,
-                    nome: true,
-                    email: true,
-                },
             });
 
             if (!aluno) {
@@ -77,6 +72,58 @@ export class AlunoController {
     }
 
     // PUT - atualizar um aluno
+    public async atualizarAluno(req: Request, res: Response) {
+        try {
+            // 1- Entrada
+            const { id } = req.params;
+            const { nome, idade } = req.body;
+
+            if (!nome && !idade) {
+                return res.status(400).send({
+                    ok: false,
+                    message: "Informe ao menos um campo para atualizar",
+                });
+            }
+
+            // 2- Processamento
+            // verificar se o aluno existe
+            const aluno = await repository.aluno.findUnique({
+                where: {
+                    id,
+                },
+            });
+
+            if (!aluno) {
+                return res.status(404).send({
+                    ok: false,
+                    message: "Aluno não existe",
+                });
+            }
+
+            // atualizar os dados do aluno
+            const result = await repository.aluno.update({
+                where: {
+                    id,
+                },
+                data: {
+                    nome,
+                    idade,
+                },
+            });
+
+            // 3- Saída
+            return res.status(200).send({
+                ok: true,
+                message: "Aluno atualizado com sucesso",
+                data: result,
+            });
+        } catch (error: any) {
+            return res.status(500).send({
+                ok: false,
+                message: error.toString(),
+            });
+        }
+    }
 
     // DELETE - deletar um aluno
     public async deletarAluno(req: Request, res: Response) {
@@ -117,5 +164,9 @@ export class AlunoController {
                 message: error.toString(),
             });
         }
+    }
+
+    public async listarAlunos(req: Request, res: Response) {
+        return res.status(200).send(await repository.aluno.findMany());
     }
 }
