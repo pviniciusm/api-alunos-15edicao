@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Aluno } from "../models/aluno.model";
 import repository from "../database/prisma.repository";
+import { erroNaoEncontrado } from "../util/response.helper";
 
 export class AlunoController {
     // Criar um novo aluno
@@ -94,10 +95,7 @@ export class AlunoController {
             });
 
             if (!aluno) {
-                return res.status(404).send({
-                    ok: false,
-                    message: "Aluno não existe",
-                });
+                return erroNaoEncontrado(res, "Aluno");
             }
 
             // atualizar os dados do aluno
