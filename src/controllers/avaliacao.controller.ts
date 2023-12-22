@@ -10,16 +10,24 @@ import { adaptAlunoPrisma } from "../util/aluno.adapter";
 
 export class AvaliacaoController {
     // POST http://localhost:3335/aluno/:id/avaliacao
-
     public async criarAvaliacao(req: Request, res: Response) {
         try {
             // 1- Entrada
             // ID do aluno
             const { id } = req.params;
             const { disciplina, nota } = req.body;
+            const { authorization } = req.headers;
 
             if (!disciplina || !nota) {
                 return erroCamposNaoInformados(res);
+            }
+
+            // Verifica se o token de auth foi informado
+            if (!authorization) {
+                return res.status(401).send({
+                    ok: false,
+                    message: "Token de autenticação não informado",
+                });
             }
 
             // 2- Processamento
@@ -32,6 +40,14 @@ export class AvaliacaoController {
 
             if (!aluno) {
                 return erroNaoEncontrado(res, "Aluno");
+            }
+
+            // Verificar se o token é válido
+            if (aluno.token !== authorization) {
+                return res.status(401).send({
+                    ok: false,
+                    message: "Token de autenticação inválido",
+                });
             }
 
             // Adapt do aluno (prisma) para o aluno (backend)
@@ -54,6 +70,101 @@ export class AvaliacaoController {
             return res.status(201).send({
                 ok: true,
                 message: "Avaliação criada com sucesso",
+                data: result,
+            });
+        } catch (error: any) {
+            return erroServidor(res, error);
+        }
+    }
+
+    // GET http://localhost:3335/aluno/:id/avaliacao
+    // Listar as avaliações de um aluno específico
+    public async listarAvaliacoes(req: Request, res: Response) {
+        try {
+            // 1- Entrada
+            const { id } = req.params;
+
+            // 2- Processamento
+            // verificar se o aluno existe, se não 404
+            const aluno = await repository.aluno.findUnique({
+                where: {
+                    id,
+                },
+                include: {
+                    avaliacoes: true,
+                },
+            });
+
+            if (!aluno) {
+                return erroNaoEncontrado(res, "Aluno");
+            }
+
+            // listar as avaliacoes
+            // const avaliacoes = await repository.avaliacao.findMany({
+            //     where: {
+            //         idAluno: id,
+            //     },
+            // });
+
+            // 3- Saída
+            return res.status(200).send({
+                ok: true,
+                message: "Avaliações listadas com sucesso",
+                data: aluno.avaliacoes,
+            });
+        } catch (error: any) {
+            return erroServidor(res, error);
+        }
+    }
+
+    // PUT http://localhost:3335/aluno/:id/avaliacao/:idAvaliacao
+    public async atualizarAvaliacao(req: Request, res: Response) {
+        try {
+            // 1- Entrada
+            const { id, idAvaliacao } = req.params;
+            const { nota } = req.body;
+
+            if (!nota) {
+                return erroCamposNaoInformados(res);
+            }
+
+            // 2- Processamento
+            // verificar se o aluno existe, se não 404
+            const aluno = await repository.aluno.findUnique({
+                where: {
+                    id,
+                },
+            });
+
+            if (!aluno) {
+                return erroNaoEncontrado(res, "Aluno");
+            }
+
+            // verificar se a avaliacao existe, se não 404
+            const avaliacao = await repository.avaliacao.findUnique({
+                where: {
+                    id: idAvaliacao,
+                },
+            });
+
+            if (!avaliacao) {
+                return erroNaoEncontrado(res, "Avaliação");
+            }
+
+            // atualizar a avaliacao
+            const result = await repository.avaliacao.update({
+                where: {
+                    id: idAvaliacao,
+                },
+                data: {
+                    nota,
+                },
+            });
+
+            // 3- Saída
+            return res.status(200).send({
+                ok: true,
+                message: "Avaliação atualizada com sucesso",
                 data: result,
             });
         } catch (error: any) {
