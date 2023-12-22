@@ -16,9 +16,12 @@ model Aluno {
   email String @db.VarChar(50) @unique
   senha String @db.VarChar(50)
 
+  token String?
+
   idade Int? @db.SmallInt
   endereco Endereco?
   avaliacoes Avaliacao[]
+  matriculas Matricula[]
 
   dthrCriacao DateTime @default(now()) @map("dthr_criacao")
   dthrAtualizacao DateTime @updatedAt @map("dthr_atualizacao")
@@ -26,6 +29,7 @@ model Aluno {
   @@map("aluno")
 }
 
+// 1 - 1
 model Endereco {
   idAluno String @db.Uuid @id @map("id_aluno")
   rua String @db.VarChar(30)
@@ -40,6 +44,7 @@ model Endereco {
   @@map("endereco")
 }
 
+// 1 - N
 model Avaliacao {
   id String @db.Uuid @id @default(uuid())
   disciplina String @db.VarChar(30)
@@ -52,4 +57,29 @@ model Avaliacao {
   dthrAtualizacao DateTime @updatedAt @map("dthr_atualizacao")
 
   @@map("avaliacao")
+}
+
+model Turma {
+  id String @db.Uuid @id @default(uuid())
+  programa String @db.VarChar(30) 
+  edicao String @db.VarChar(30)
+  maxAlunos Int? @map("max_alunos")
+
+  matriculas Matricula[]
+
+  @@map("turma")
+}
+
+// N - N
+model Matricula {
+  idAluno String @db.Uuid @map("id_aluno")
+  idTurma String @db.Uuid @map("id_turma")
+
+  dtCriacao DateTime @default(now()) @map("dt_criacao")
+
+  aluno Aluno @relation(fields: [idAluno], references: [id])
+  turma Turma @relation(fields: [idTurma], references: [id])
+
+  @@id([idAluno, idTurma])
+  @@map("matricula")
 }
