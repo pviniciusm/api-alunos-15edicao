@@ -1,9 +1,5 @@
 import { Request, Response } from "express";
-import {
-    erroCamposNaoInformados,
-    erroNaoEncontrado,
-    erroServidor,
-} from "../util/response.helper";
+import { erroCamposNaoInformados, erroNaoEncontrado, erroServidor } from "../util/response.helper";
 import repository from "../database/prisma.repository";
 import { Avaliacao } from "../models/avaliacao.model";
 import { adaptAlunoPrisma } from "../util/aluno.adapter";
@@ -122,7 +118,7 @@ export class AvaliacaoController {
         try {
             // 1- Entrada
             const { id, idAvaliacao } = req.params;
-            const { nota } = req.body;
+            const { nota, disciplina } = req.body;
 
             if (!nota) {
                 return erroCamposNaoInformados(res);
@@ -158,6 +154,7 @@ export class AvaliacaoController {
                 },
                 data: {
                     nota,
+                    disciplina,
                 },
             });
 
