@@ -1,10 +1,13 @@
 import express from "express";
+import cors from "cors";
+
 import { AlunoController } from "./controllers/aluno.controller";
 import { AvaliacaoController } from "./controllers/avaliacao.controller";
 import { AuthController } from "./controllers/auth.controller";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const alunoController = new AlunoController();
 const avaliacaoController = new AvaliacaoController();
