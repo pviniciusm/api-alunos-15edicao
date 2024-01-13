@@ -12,18 +12,9 @@ export class AvaliacaoController {
             // ID do aluno
             const { id } = req.params;
             const { disciplina, nota } = req.body;
-            const { authorization } = req.headers;
 
             if (!disciplina || !nota) {
                 return erroCamposNaoInformados(res);
-            }
-
-            // Verifica se o token de auth foi informado
-            if (!authorization) {
-                return res.status(401).send({
-                    ok: false,
-                    message: "Token de autenticação não informado",
-                });
             }
 
             // 2- Processamento
@@ -36,14 +27,6 @@ export class AvaliacaoController {
 
             if (!aluno) {
                 return erroNaoEncontrado(res, "Aluno");
-            }
-
-            // Verificar se o token é válido
-            if (aluno.token !== authorization) {
-                return res.status(401).send({
-                    ok: false,
-                    message: "Token de autenticação inválido",
-                });
             }
 
             // Adapt do aluno (prisma) para o aluno (backend)
