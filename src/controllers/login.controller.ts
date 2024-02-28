@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import repository from "../database/prisma.repository";
 import { randomUUID } from "crypto";
+import { erroCamposNaoInformados, erroServidor } from "../util/response.helper";
+import { AuthService } from "../services/auth.service";
 
 export class LoginController {
     public async login(req: Request, res: Response) {
@@ -8,47 +10,21 @@ export class LoginController {
             // 1- Entrada
             const { email, senha } = req.body;
 
-            // 2- Processamento
-            const aluno = await repository.aluno.findFirst({
-                where: {
-                    email,
-                    senha,
-                },
-            });
-
-            if (!aluno) {
-                return res.status(401).send({
-                    ok: false,
-                    message: "Credenciais inválidas",
-                });
+            if (!email || !senha) {
+                return erroCamposNaoInformados(res);
             }
 
-            const token = randomUUID();
-
-            await repository.aluno.update({
-                where: {
-                    id: aluno.id,
-                },
-                data: {
-                    token,
-                },
+            // 2- Processamento
+            const authService = new AuthService();
+            const result = await authService.login({
+                email,
+                senha,
             });
 
             // 3- Saída
-            return res.status(200).send({
-                ok: true,
-                message: "Login realizado com sucesso",
-                data: {
-                    id: aluno.id,
-                    nome: aluno.nome,
-                    token,
-                },
-            });
+            return res.status(result.code).send(result);
         } catch (error: any) {
-            return res.status(500).send({
-                ok: false,
-                message: error.toString(),
-            });
+            return erroServidor(res, error);
         }
     }
 }

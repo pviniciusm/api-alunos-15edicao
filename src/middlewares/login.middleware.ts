@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import repository from "../database/prisma.repository";
+import { AuthService } from "../services/auth.service";
 
 export async function validaLoginMiddleware(req: Request, res: Response, next: NextFunction) {
     try {
@@ -14,17 +15,31 @@ export async function validaLoginMiddleware(req: Request, res: Response, next: N
             });
         }
 
-        const aluno = await repository.aluno.findUnique({
-            where: {
-                id,
-            },
-        });
+        const authService = new AuthService();
+        const result = await authService.validateLogin(authorization, id);
 
-        if (!aluno || aluno.token !== authorization) {
-            return res.status(401).send({
-                ok: false,
-                message: "Token de autenticação inválido",
-            });
+        if (!result.ok) {
+            return res.status(result.code).send(result);
+        }
+
+        next();
+    } catch (error: any) {
+        return res.status(500).send({
+            ok: false,
+            message: error.toString(),
+        });
+    }
+}
+
+export async function validaLoginMaiorIdadeMiddleware(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+
+        const authService = new AuthService();
+        const result = await authService.validateLoginMaiorIdade(id);
+
+        if (!result.ok) {
+            return res.status(result.code).send(result);
         }
 
         next();
