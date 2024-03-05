@@ -17,6 +17,7 @@ model Aluno {
   senha String @db.VarChar(50)
 
   token String?
+  tipo String @db.VarChar(1) @default("M")
 
   idade Int? @db.SmallInt
   endereco Endereco?

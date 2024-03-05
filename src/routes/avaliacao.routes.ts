@@ -1,6 +1,12 @@
-import { Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { AvaliacaoController } from "../controllers/avaliacao.controller";
-import { validaLoginMaiorIdadeMiddleware, validaLoginMiddleware } from "../middlewares/login.middleware";
+import { validateTokenMid } from "../middlewares/auth.middleware";
+import {
+    validateAutorizacaoMid,
+    validateCreateAvaliacaoMid,
+    validateTechHelperMid,
+} from "../middlewares/autorizacao.middleware";
+import { TipoAluno } from "../models/aluno.model";
 
 // http://localhost:3335/aluno/:id/avaliacao
 
@@ -12,9 +18,19 @@ export function avaliacaoRoutes() {
     const avaliacaoController = new AvaliacaoController();
 
     // Rotas de avaliação
-    router.post("/", [validaLoginMiddleware], avaliacaoController.criarAvaliacao);
-    router.get("/", [validaLoginMiddleware, validaLoginMaiorIdadeMiddleware], avaliacaoController.listarAvaliacoes);
-    router.put("/:idAvaliacao", [validaLoginMiddleware], avaliacaoController.atualizarAvaliacao);
+    router.post(
+        "/",
+        [validateTokenMid, validateAutorizacaoMid([TipoAluno.Matriculado, TipoAluno.TechHelper])],
+        avaliacaoController.criarAvaliacao
+    );
+
+    router.get("/", [validateTokenMid], avaliacaoController.listarAvaliacoes);
+
+    router.put(
+        "/:idAvaliacao",
+        [validateTokenMid, validateAutorizacaoMid([TipoAluno.TechHelper])],
+        avaliacaoController.atualizarAvaliacao
+    );
 
     return router;
 }

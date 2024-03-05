@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { logMiddleware } from "../middlewares/log.middleware";
 import { validaEmailSenhaMiddleware } from "../middlewares/aluno.middleware";
-import { validaLoginMiddleware } from "../middlewares/login.middleware";
 import { AlunoController } from "../controllers/aluno.controller";
 import { avaliacaoRoutes } from "./avaliacao.routes";
+import { validateTokenMid } from "../middlewares/auth.middleware";
 
 // http://localhost:3335/aluno
 
@@ -18,8 +18,8 @@ export function alunoRoutes() {
     router.post("/", [logMiddleware, validaEmailSenhaMiddleware], alunoController.criarAluno);
     router.get("/:id", [logMiddleware], alunoController.obterAluno);
     router.get("/", [logMiddleware], alunoController.listarAlunos);
-    router.delete("/:id", [validaLoginMiddleware], alunoController.deletarAluno);
-    router.put("/:id", [validaLoginMiddleware], alunoController.atualizarAluno);
+    router.delete("/:id", [validateTokenMid], alunoController.deletarAluno);
+    router.put("/:id", [validateTokenMid], alunoController.atualizarAluno);
 
     // /aluno/:id/avaliacao
     router.use("/:id/avaliacao", avaliacaoRoutes());

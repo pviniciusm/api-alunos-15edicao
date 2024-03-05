@@ -1,4 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
+import { TipoAluno } from "../models/aluno.model";
 
 export interface LoginDTO {
     email: string;
@@ -8,4 +9,5 @@ export interface LoginDTO {
 export interface PayloadToken extends JwtPayload {
     id: string;
     nome: string;
+    tipo: TipoAluno;
 }

@@ -8,7 +8,7 @@ export class AlunoController {
     public async criarAluno(req: Request, res: Response) {
         try {
             // 1- Entrada
-            const { nome, email, senha, idade } = req.body;
+            const { nome, email, senha, idade, tipo } = req.body;
 
             if (!nome) {
                 return res.status(400).send({
@@ -18,7 +18,7 @@ export class AlunoController {
             }
 
             // 2- Processamento
-            const aluno = new Aluno(nome, email, senha, idade);
+            const aluno = new Aluno(nome, email, senha, tipo, idade);
 
             const result = await repository.aluno.create({
                 data: aluno,
