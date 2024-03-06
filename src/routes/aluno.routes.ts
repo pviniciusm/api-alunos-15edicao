@@ -16,8 +16,8 @@ export function alunoRoutes() {
 
     // Rotas de aluno
     router.post("/", [logMiddleware, validaEmailSenhaMiddleware], alunoController.criarAluno);
-    router.get("/:id", [logMiddleware], alunoController.obterAluno);
     router.get("/", [logMiddleware], alunoController.listarAlunos);
+    router.get("/:id", [validateTokenMid], alunoController.obterAluno);
     router.delete("/:id", [validateTokenMid], alunoController.deletarAluno);
     router.put("/:id", [validateTokenMid], alunoController.atualizarAluno);
 

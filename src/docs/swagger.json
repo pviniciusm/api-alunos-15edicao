@@ -1,0 +1,186 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "API de Alunos",
+        "description": "Sistema de cadastro de alunos da Growdev",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/aluno": {
+            "description": "Rotas de alunos",
+            "get": {
+                "description": "Listar todos os alunos cadastrados",
+                "tags": ["Aluno"],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Alunos listados com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/aluno"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro genérico de servidor ou Neon caiu"
+                    }
+                }
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Sucesso"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "description": "Rotas de autenticação",
+            "post": {
+                "description": "Realizar autenticação mediante login com e-mail e senha",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": { "type": "string" },
+                                    "senha": { "type": "string" }
+                                },
+                                "required": ["email", "senha"]
+                            }
+                        }
+                    }
+                },
+                "tags": ["Auth"],
+                "responses": {
+                    "200": {
+                        "description": "Login realizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/loginSucesso"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Campos não informados"
+                    },
+                    "401": {
+                        "description": "Credenciais inválidas"
+                    },
+                    "500": {
+                        "description": "Erro de servidor ou o Neon caiu"
+                    }
+                }
+            }
+        },
+        "/aluno/{id}": {
+            "get": {
+                "description": "Obter um único aluno através do seu ID",
+                "tags": ["Aluno"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "description": "ID do usuário a ser consultado",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "auth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Aluno obtido com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/aluno"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aluno não encontrado"
+                    },
+                    "500": {
+                        "description": "Erro de servidor ou o Neon caiu"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "aluno": {
+                "description": "Interface de modelagem de um aluno da Growdev",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "123456"
+                    },
+                    "nome": {
+                        "type": "string",
+                        "example": "Daphne Dog"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "daphne@dog.com"
+                    },
+                    "senha": {
+                        "type": "string"
+                    },
+                    "tipo": {
+                        "type": "string"
+                    },
+                    "idade": {
+                        "type": "number",
+                        "nullable": true
+                    }
+                }
+            },
+            "loginSucesso": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "token": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "auth": {
+                "name": "Authorization",
+                "in": "header",
+                "description": "JWT authentication token",
+                "type": "apiKey"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Aluno",
+            "description": "Rotas relacionadas a alunos"
+        },
+        {
+            "name": "Auth",
+            "description": "Rotas de autenticação"
+        }
+    ]
+}

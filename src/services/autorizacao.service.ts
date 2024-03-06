@@ -3,6 +3,9 @@ import { Result } from "../contracts/result.contract";
 import { TipoAluno } from "../models/aluno.model";
 import { AuthService } from "./auth.service";
 
+/**
+ * Classe de autorização
+ */
 export class AutorizacaoService {
     public validateAutorizacao(token: string, tiposPermitidos: TipoAluno[]): Result {
         const service = new AuthService();
