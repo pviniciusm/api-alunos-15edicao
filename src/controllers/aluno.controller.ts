@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Aluno } from "../models/aluno.model";
 import repository from "../database/prisma.repository";
 import { erroNaoEncontrado } from "../util/response.helper";
+import { AlunoService } from "../services/aluno.service";
 
 export class AlunoController {
     // Criar um novo aluno
@@ -17,19 +18,16 @@ export class AlunoController {
                 });
             }
 
-            // 2- Processamento
-            const aluno = new Aluno(nome, email, senha, tipo, idade);
-
-            const result = await repository.aluno.create({
-                data: aluno,
+            const alunoService = new AlunoService();
+            const result = await alunoService.criar({
+                nome,
+                email,
+                senha,
+                idade,
+                tipo,
             });
 
-            // 3- Saída
-            return res.status(201).send({
-                ok: true,
-                message: "Usuário criado com sucesso",
-                data: result,
-            });
+            return res.status(result.code).send(result);
         } catch (error: any) {
             return res.status(500).send({
                 ok: false,
